@@ -1,0 +1,149 @@
+Parent HTML:- 
+<template>
+   
+
+    <lightning-card title="Parent Componant" icon-name="standard:account">
+        <p class="slds-text-align_center">Counted Child:{countvalue}</p>
+
+        <lightning-button label={buttonclear} icon-name="action:delete" onclick={handleClear} title="clear"></lightning-button>       
+        <lightning-button label={buttonshow} icon-name="utility:settings" onclick={handleShow} title="show"></lightning-button>
+    </lightning-card>
+    
+   <!--calling child lwc-->
+  <template if:true={visible}>
+    <div>
+        <c-count-child onsubstract={handleDecrement}
+            onadd={handleIncrement}
+            onmultiply={handleMultiply}
+            ondivide={handleDivide}>
+        </c-count-child>
+    </div>
+  </template>
+
+</template>
+
+Parent JS:-
+import { LightningElement, track } from 'lwc';
+
+export default class CountParentChild extends LightningElement {
+    countvalue=0;
+
+    @track buttonclear='clear';
+    @track buttonshow = 'show';
+    @track visible=false;
+
+    handleDecrement(){
+        this.countvalue--;
+    }
+    handleIncrement(){
+        this.countvalue++;
+    }
+    handleMultiply(event){
+        const multiplingNumber=event.detail;
+        this.countvalue*=multiplingNumber;
+    }
+    handleDivide(event){
+        const numdiv=event.detail;
+        this.countvalue/=numdiv;
+    }
+
+    handleClear(event){
+        const label = event.target.label;
+
+        if(label==='clear'){            
+            this.visible=false;
+        }      
+
+    }
+
+    handleShow(event){
+        const label = event.target.label;
+        if(label=='show'){
+            this.visible=true;
+        }
+    }
+
+}
+
+Child HTML:- 
+<template>
+    <lightning-card title="Child Lwc" icon-name="action:upload">
+
+
+        <!-- substract button -->
+        <lightning-button class="slds-p-horizontal_medium "
+             label="Substract"
+             icon-name="utility:dash"
+             onclick={handleSubstract}>
+        </lightning-button>
+
+
+        <!-- add button -->
+        <lightning-button class="slds-p-horizontal_medium "
+            label="Add"
+            icon-name="utility:add"
+            onclick={handleAdd}>
+        </lightning-button>
+
+
+        <!-- 0x Multiply button -->
+        <lightning-button class="slds-p-horizontal_small "
+            label="0X Multiply"
+            value="0"
+            onclick={handleMultiply}>
+        </lightning-button>
+
+
+        <!-- 2x Multiply button -->
+        <lightning-button class="slds-p-horizontal_small "
+            label="2X Multiply"
+            value="2"        
+            onclick={handleMultiply}>
+        </lightning-button>
+
+
+        <!-- 3x Multiply button -->
+        <lightning-button
+        label="3X Multiply"
+        value="3"        
+        onclick={handleMultiply}>
+        </lightning-button>
+
+        <!-- Divide Button -->
+        <lightning-button 
+        label="/ Divide"
+        icon-name="utility:divide"
+        value="2"
+        onclick={handleDivide}>
+        </lightning-button>
+
+
+    </lightning-card>
+</template>
+
+Child JS:- 
+import { LightningElement } from 'lwc';
+
+export default class CountChild extends LightningElement {
+    handleSubstract(){
+        this.dispatchEvent(new CustomEvent('substract'));
+    }
+
+
+    handleAdd(){
+        this.dispatchEvent(new CustomEvent('add'));
+    }
+
+
+    handleMultiply(event){
+        const valueformultiply=event.target.value;
+        this.dispatchEvent(new CustomEvent('multiply',{
+            detail:valueformultiply
+        }))
+    }
+
+    handleDivide(event){
+        const valdiv = event.target.value;
+        this.dispatchEvent(new CustomEvent('divide',{detail:valdiv}))
+    }
+}
